@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Application libre pour réviser les kana, le vocabulaire et les kanji japonais." />
+    <meta name="theme-color" content="#333333" />
+    <title>Nihongo Renshū</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <script type="module" src="src/main.js"></script>
+  </head>
+  <body class="theme-kp">
+    <header class="topbar">
+      <a class="brand" href="#/"><span class="dot"></span>日本語<span class="brand-sub">練習</span></a>
+      <nav hidden>
+        <a href="#/">Accueil</a>
+        <a href="#/kana">Kana</a>
+        <a href="#/vocab">Vocabulaire</a>
+        <a href="#/kanji">Kanji</a>
+        <a href="#/tips">Astuces</a>
+        <a href="#/progress">Progrès</a>
+      </nav>
+      <button id="theme-toggle" type="button" hidden>Thème</button>
+    </header>
+    <main id="app"></main>
+    <noscript>Nihongo Renshū a besoin de JavaScript pour fonctionner.</noscript>
+  </body>
+</html>
