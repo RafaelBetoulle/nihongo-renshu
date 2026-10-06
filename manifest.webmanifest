@@ -1,0 +1,12 @@
+{
+  "name": "Nihongo Renshū",
+  "short_name": "Renshū",
+  "description": "Réviser les kana, le vocabulaire et les kanji japonais.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e5e5e5",
+  "theme_color": "#333333",
+  "icons": [{ "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
