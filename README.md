@@ -11,7 +11,9 @@ l'appareil.
 - **Kana façon [Kana Pro](https://kana.pro/legacy)** : choisis les groupes à réviser puis enchaîne les 4 étapes
   (QCM, QCM inversé, saisie, trois caractères à la fois). Il faut 20 points par étape : +1 par bonne réponse, −1 par
   erreur. Tu choisis les étapes à jouer : une seule ou plusieurs.
-- **Vocabulaire** : 10 listes thématiques (~150 mots), à réviser dans les deux sens, en QCM ou en tapant le rōmaji.
+- **Vocabulaire et verbes** : 10 listes thématiques (~150 mots) à travailler façon Quizlet — cartes mémoire à
+  retourner, mode « Apprendre » pas à pas, jeu d'association chronométré, test noté configurable et exercices (QCM ou saisie en rōmaji, dans
+  les deux sens, forme du dictionnaire des verbes).
 - **Kanji N5** : environ 100 kanji avec leur sens, leurs lectures on/kun et des mots d'exemple.
 - **Daily** : chaque jour, une session en vrac qui mélange ce qui est à revoir (répétition espacée), tes points
   faibles et quelques nouveautés.
@@ -20,7 +22,7 @@ l'appareil.
 - **Aides à la lecture** : rōmaji et sens de chaque kanji affichés à côté du japonais, sauf quand c'est la réponse
   attendue. Prononciation par la synthèse vocale du navigateur.
 - **Plusieurs profils** sur le même appareil, export et import de la progression.
-- **Deux thèmes** : « Kana Pro » (clair) et « Moderne » (clair/sombre selon le système).
+- **Deux thèmes** : « Classique » (clair) et « Moderne » (clair/sombre selon le système).
 - **Installable et utilisable hors ligne** (PWA).
 
 ## Utiliser

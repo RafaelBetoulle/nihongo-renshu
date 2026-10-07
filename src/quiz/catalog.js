@@ -67,6 +67,17 @@ export const drawingOf = (item) =>
 
 const reading = (w) => (hasKanji(w.jp) || w.jp !== w.kana ? w.kana : "");
 
+// Reading aids are attached to every question; the session shows them according to the difficulty.
+const VOCAB_NOTES = Object.fromEntries(vocab.map((x) => [x.jp, { reading: reading(x), romaji: x.romaji }]));
+
+// Wrong answers come from the word's own list (verbs among verbs, numbers among numbers) so that
+// the right one cannot be guessed from its category; other lists only fill in if the list is too small.
+function vocabChoices(w, field) {
+  const same = vocab.filter((x) => x.list === w.list).map((x) => x[field]);
+  const enough = new Set(same).size >= 4;
+  return choices(w[field], enough ? same : [...same, ...vocab.map((x) => x[field])]);
+}
+
 function vocabReveal(w) {
   const r = reading(w);
   return `<span class="jp">${esc(w.jp)}</span>${r ? ` <span class="muted">(${esc(r)})</span>` : ""} · <i>${esc(w.romaji)}</i> — ${esc(w.fr)}`;
@@ -122,16 +133,14 @@ const BUILDERS = {
       speak: w.kana,
       short: w.jp
     }),
-    meaning: (w, settings) => ({
+    meaning: (w) => ({
       kind: "choice",
       prompt: w.jp,
       promptClass: "jp",
-      sub: settings.showReading ? [reading(w), w.romaji].filter(Boolean).join(" · ") : "",
+      subReading: reading(w),
+      subRomaji: w.romaji,
       label: "Que veut dire… ?",
-      options: choices(
-        w.fr,
-        vocab.map((x) => x.fr)
-      ),
+      options: vocabChoices(w, "fr"),
       correct: w.fr,
       correctText: w.fr,
       reveal: vocabReveal(w),
@@ -143,13 +152,10 @@ const BUILDERS = {
       prompt: w.fr,
       promptClass: "fr",
       label: "Comment dit-on… ?",
-      options: choices(
-        w.jp,
-        vocab.map((x) => x.jp)
-      ),
+      options: vocabChoices(w, "jp"),
       correct: w.jp,
       optionClass: "jp-opt",
-      optionNotes: Object.fromEntries(vocab.map((x) => [x.jp, x.romaji])),
+      optionNotes: VOCAB_NOTES,
       correctText: w.jp,
       reveal: vocabReveal(w),
       speak: w.kana,
@@ -165,6 +171,25 @@ const BUILDERS = {
       reveal: vocabReveal(w),
       speak: w.kana,
       short: w.fr
+    }),
+    dict: (w) => ({
+      kind: "choice",
+      prompt: w.jp,
+      promptClass: "jp",
+      subReading: reading(w),
+      subRomaji: w.romaji,
+      sub: w.fr,
+      label: "Forme du dictionnaire ?",
+      options: choices(
+        w.note,
+        vocab.filter((x) => x.note).map((x) => x.note)
+      ),
+      correct: w.note,
+      optionClass: "jp-opt",
+      correctText: w.note,
+      reveal: `${vocabReveal(w)} · dico : <span class="jp">${esc(w.note)}</span>`,
+      speak: w.kana,
+      short: w.jp
     })
   },
   kanji: {
@@ -221,7 +246,8 @@ export const MODES = {
     { id: "meaning", label: "Sens", hint: "japonais → choisir le français" },
     { id: "recall", label: "Inverse", hint: "français → choisir le japonais" },
     { id: "write", label: "Inverse écrit", hint: "français → taper le rōmaji" },
-    { id: "mix", label: "Mélange", hint: "un peu de tout" }
+    { id: "mix", label: "Mélange", hint: "un peu de tout" },
+    { id: "dict", label: "Forme du dictionnaire", hint: "verbe en ます → choisir 行く, 食べる…", needs: "note" }
   ],
   kanji: [
     { id: "meaning", label: "Sens", hint: "kanji → choisir le sens" },
@@ -233,10 +259,10 @@ export const MODES = {
 
 const MIX = { kana: ["read", "write"], vocab: ["read", "meaning", "recall"], kanji: ["meaning", "word"] };
 
-export function buildQuestion(item, mode, { settings, tipFor }) {
+export function buildQuestion(item, mode, { tipFor }) {
   const builders = BUILDERS[item.module];
   const chosen = builders[mode] ? mode : pick(MIX[item.module]);
-  const q = builders[chosen](item, settings);
+  const q = builders[chosen](item);
   const drawing = drawingOf(item);
   return {
     ...q,

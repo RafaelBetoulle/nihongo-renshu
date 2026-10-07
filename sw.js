@@ -1,4 +1,4 @@
-const CACHE = "nihongo-renshu-v2";
+const CACHE = "nihongo-renshu-v6";
 
 const ASSETS = [
   "./",
@@ -6,6 +6,7 @@ const ASSETS = [
   "manifest.webmanifest",
   "styles/main.css",
   "assets/icon.svg",
+  "assets/favicon.svg",
   "src/main.js",
   "src/views/home.js",
   "src/views/kana.js",
@@ -13,6 +14,11 @@ const ASSETS = [
   "src/views/study.js",
   "src/views/tips.js",
   "src/views/ui.js",
+  "src/views/vocab.js",
+  "src/views/flashcards.js",
+  "src/views/difficulty.js",
+  "src/views/match.js",
+  "src/views/test.js",
   "src/views/welcome.js",
   "src/content/kana.js",
   "src/content/kanji.js",
@@ -22,6 +28,8 @@ const ASSETS = [
   "src/quiz/catalog.js",
   "src/quiz/daily.js",
   "src/quiz/kanapro.js",
+  "src/quiz/learn.js",
+  "src/quiz/test.js",
   "src/quiz/session.js",
   "src/core/japanese.js",
   "src/core/romaji.js",

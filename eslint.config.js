@@ -14,6 +14,8 @@ export default [
         confirm: "readonly",
         prompt: "readonly",
         setTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
         URL: "readonly",
         Blob: "readonly",
         CSS: "readonly",

@@ -32,12 +32,13 @@ test("every base katakana has a tip and a drawing", () => {
 test("every question can be built in every mode", () => {
   const modes = {
     kana: ["read", "write"],
-    vocab: ["read", "meaning", "recall", "write"],
+    vocab: ["read", "meaning", "recall", "write", "dict"],
     kanji: ["meaning", "reading", "word"]
   };
   for (const [module, list] of Object.entries(MODULES)) {
     for (const item of list) {
       for (const mode of modes[module]) {
+        if (mode === "dict" && !item.note) continue;
         const q = buildQuestion(item, mode, { settings, tipFor });
         if (q.kind === "choice") {
           assert.ok(q.options.includes(q.correct), `${item.key} ${mode}`);
@@ -46,6 +47,24 @@ test("every question can be built in every mode", () => {
           assert.ok(q.answers.length > 0, `${item.key} ${mode}`);
         }
       }
+    }
+  }
+});
+
+test("multiple-choice answers for a word all come from its own list", () => {
+  const byText = { fr: new Map(), jp: new Map() };
+  for (const w of MODULES.vocab) {
+    byText.fr.set(w.fr, [...(byText.fr.get(w.fr) ?? []), w.list]);
+    byText.jp.set(w.jp, [...(byText.jp.get(w.jp) ?? []), w.list]);
+  }
+  for (const w of MODULES.vocab) {
+    for (const [mode, field] of [
+      ["meaning", "fr"],
+      ["recall", "jp"]
+    ]) {
+      const q = buildQuestion(w, mode, { settings, tipFor });
+      assert.equal(q.options.length, 4, `${w.key} ${mode}`);
+      for (const o of q.options) assert.ok(byText[field].get(o).includes(w.list), `${w.key} ${mode} ${o}`);
     }
   }
 });

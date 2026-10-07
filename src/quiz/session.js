@@ -2,12 +2,15 @@ import { matches } from "../core/romaji.js";
 import { speak } from "../core/speech.js";
 import { esc, shuffle } from "../core/util.js";
 import { buildQuestion } from "./catalog.js";
+import { bindDifficulty, difficultyBar } from "../views/difficulty.js";
 
 const AUTO_NEXT_MS = { type: 650, choice: 1100 };
 
 // Kana Pro–style session: typed answers are accepted as soon as they are right, Enter means
 // "I don't know", and missed questions come back at the end until they are answered correctly.
-export function startSession(outer, entries, { store, ui, title, onExit }) {
+// `onAnswer(entry, ok)` is called for first tries only; `more()` may return `{ note, label, run }` to
+// replace "Recommencer" by a follow-up action on the result screen (used by the Learn mode).
+export function startSession(outer, entries, { store, ui, title, onExit, onAnswer, more }) {
   const root = document.createElement("div");
   outer.replaceChildren(root);
 
@@ -41,6 +44,7 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
         <div class="q-feedback"></div>
       </div>
       <div class="quiz-hint muted"></div>
+      ${difficultyBar()}
     </div>`;
 
   const $ = (s) => root.querySelector(s);
@@ -52,6 +56,24 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
   $("[data-act=quit]").onclick = () => finish(true);
   $(".speak").onclick = () => speak(q?.speak);
   $(".hint-btn").onclick = () => showTip();
+
+  // Reading aids follow the difficulty settings and can change while a question is on screen.
+  function renderAids() {
+    const s = store.settings;
+    const notes = (n) => [s.showReading && n?.reading, s.romaji && n?.romaji].filter(Boolean).join(" · ");
+    $(".q-meanings").innerHTML = q.meaningsOf ? ui.meanings(q.meaningsOf) : "";
+    $(".q-sub").textContent = [notes({ reading: q.subReading, romaji: q.subRomaji }), q.sub]
+      .filter(Boolean)
+      .join(" · ");
+    root.querySelectorAll(".opt-ro").forEach((el) => {
+      el.textContent = notes(q.optionNotes[q.options[Number(el.dataset.i)]]);
+    });
+  }
+  bindDifficulty(root, store, () => {
+    if (state === "end") return;
+    renderAids();
+    $(".answer-input")?.focus();
+  });
 
   function updateProgress() {
     $(".progress-bar").style.width = `${(100 * done) / total}%`;
@@ -68,7 +90,7 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
   function next() {
     if (!queue.length) return finish(false);
     current = queue.shift();
-    q = buildQuestion(current.item, current.mode, { settings: store.settings, tipFor: ui.tipFor });
+    q = buildQuestion(current.item, current.mode, { tipFor: ui.tipFor });
     state = "ask";
     hinted = false;
     card.classList.remove("ok", "ko");
@@ -76,14 +98,13 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
     $(".q-label").textContent = q.label + (current.retry ? " · à revoir" : "");
     $(".q-prompt").className = `q-prompt ${q.promptClass}`;
     $(".q-prompt").textContent = q.prompt;
-    $(".q-meanings").innerHTML = q.meaningsOf ? ui.meanings(q.meaningsOf) : "";
-    $(".q-sub").textContent = q.sub ?? "";
     $(".q-tip").innerHTML = "";
     $(".q-feedback").className = "q-feedback";
     $(".q-feedback").innerHTML = "";
     $(".speak").hidden = !q.speak;
     $(".hint-btn").hidden = !q.tip;
     renderAnswer();
+    renderAids();
     updateProgress();
   }
 
@@ -99,11 +120,11 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
       setHint("Tape la réponse — validation automatique. Entrée si tu ne sais pas.");
       return;
     }
-    const note = (o) => (store.settings.romaji ? q.optionNotes?.[o] : "");
+    const note = (i) => (q.optionNotes ? `<span class="opt-ro" data-i="${i}"></span>` : "");
     box.innerHTML = `<div class="options">${q.options
       .map(
         (o, i) =>
-          `<button class="opt ${q.optionClass ?? ""}" data-i="${i}"><span class="num">${i + 1}</span>${esc(o)}${note(o) ? `<span class="opt-ro">${esc(note(o))}</span>` : ""}</button>`
+          `<button class="opt ${q.optionClass ?? ""}" data-i="${i}"><span class="num">${i + 1}</span>${esc(o)}${note(i)}</button>`
       )
       .join("")}</div>`;
     box.querySelectorAll(".opt").forEach((b) => {
@@ -130,6 +151,7 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
     if (!current.retry) {
       store.record(q.key, ok, hinted);
       if (ok && !hinted) firstTry++;
+      onAnswer?.(current, ok && !hinted);
     }
     const input = $(".answer-input");
     if (input) input.disabled = true;
@@ -189,6 +211,7 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
     if (done || errors.size) store.logSession({ title, total, firstTry, secs });
     const pct = total ? Math.round((100 * firstTry) / total) : 0;
     const missed = [...errors.values()].sort((a, b) => b.count - a.count);
+    const follow = more?.();
 
     root.innerHTML = `
       <div class="card result">
@@ -208,9 +231,11 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
               ? ""
               : `<p class="center">Aucune erreur, bravo ! すごい！</p>`
         }
+        ${follow?.note ? `<p class="center">${follow.note}</p>` : ""}
         <div class="actions">
-          ${missed.length ? `<button class="btn primary" data-act="errors">Revoir mes erreurs</button>` : ""}
-          <button class="btn" data-act="again">Recommencer</button>
+          ${follow?.label ? `<button class="btn primary" data-act="more">${esc(follow.label)}</button>` : ""}
+          ${missed.length && !follow ? `<button class="btn primary" data-act="errors">Revoir mes erreurs</button>` : ""}
+          ${follow ? "" : `<button class="btn" data-act="again">Recommencer</button>`}
           <button class="btn ghost" data-act="back">Retour</button>
         </div>
       </div>`;
@@ -218,8 +243,10 @@ export function startSession(outer, entries, { store, ui, title, onExit }) {
     root
       .querySelector("[data-act=errors]")
       ?.addEventListener("click", () => startSession(outer, shuffle(retryErrors), { store, ui, title, onExit }));
-    root.querySelector("[data-act=again]").onclick = () =>
-      startSession(outer, shuffle(entries), { store, ui, title, onExit });
+    root.querySelector("[data-act=more]")?.addEventListener("click", follow.run);
+    root
+      .querySelector("[data-act=again]")
+      ?.addEventListener("click", () => startSession(outer, shuffle(entries), { store, ui, title, onExit }));
     root.querySelector("[data-act=back]").onclick = onExit;
   }
 

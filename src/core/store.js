@@ -20,7 +20,8 @@ const emptyProfile = (name) => ({
   progress: {},
   history: [],
   tips: {},
-  prefs: {}
+  prefs: {},
+  learn: {}
 });
 
 function safeStorage() {
@@ -60,6 +61,7 @@ export function createStore(backend = safeStorage()) {
     data.settings = { ...DEFAULT_SETTINGS, ...data.settings };
     data.tips ??= {};
     data.prefs ??= {};
+    data.learn ??= {};
     return data;
   }
 
@@ -129,6 +131,16 @@ export function createStore(backend = safeStorage()) {
     mastery: (key) => srs.mastery(profile.progress[key]),
     dueKeys: () => Object.keys(profile.progress).filter((k) => srs.isDue(profile.progress[k])),
 
+    learnStage: (key) => profile.learn[key] ?? 0,
+    setLearnStage(key, stage) {
+      profile.learn[key] = stage;
+      save();
+    },
+    resetLearn(keys) {
+      for (const key of keys) delete profile.learn[key];
+      save();
+    },
+
     logSession(entry) {
       profile.history.push({ date: Date.now(), ...entry });
       if (profile.history.length > 500) profile.history.shift();
@@ -151,13 +163,14 @@ export function createStore(backend = safeStorage()) {
       Object.assign(profile, {
         progress: incoming.progress,
         history: incoming.history ?? [],
-        tips: incoming.tips ?? {}
+        tips: incoming.tips ?? {},
+        learn: incoming.learn ?? {}
       });
       profile.settings = { ...DEFAULT_SETTINGS, ...incoming.settings };
       save();
     },
     resetProgress() {
-      Object.assign(profile, { progress: {}, history: [] });
+      Object.assign(profile, { progress: {}, history: [], learn: {} });
       save();
     }
   };

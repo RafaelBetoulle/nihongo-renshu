@@ -6,7 +6,7 @@ import { esc } from "../core/util.js";
 const MODULE_LABELS = { kana: "Kana", vocab: "Vocabulaire", kanji: "Kanji" };
 
 const TOGGLES = [
-  ["showReading", "Afficher la lecture sous les mots (questions « Sens »)"],
+  ["showReading", "Afficher la lecture en kana sous les mots en kanji"],
   ["romaji", "Afficher le rōmaji à côté du japonais (sauf quand c'est la réponse attendue)"],
   ["kanjiMeaning", "Afficher le sens de chaque kanji (ex. 図書館 → 図 plan · 書 écrire · 館 bâtiment)"],
   ["tipOnError", "Montrer l'astuce après une erreur"],
@@ -61,7 +61,7 @@ export function renderProgress(ctx) {
     <div class="card"><h2>Dernières sessions</h2>${historyTable(store.history)}</div>
     <div class="card"><h2>Réglages</h2>
       <div class="check">Thème :
-        <label><input type="radio" name="theme" value="kanapro" ${s.theme === "kanapro" ? "checked" : ""}> Kana Pro (clair)</label>
+        <label><input type="radio" name="theme" value="kanapro" ${s.theme === "kanapro" ? "checked" : ""}> Classique (clair)</label>
         <label><input type="radio" name="theme" value="modern" ${s.theme === "modern" ? "checked" : ""}> Moderne (suit le mode clair/sombre du système)</label>
       </div>
       ${TOGGLES.map(([key, label]) => `<label class="check"><input type="checkbox" data-setting="${key}" ${s[key] ? "checked" : ""}> ${label}</label>`).join("")}

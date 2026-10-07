@@ -3,11 +3,11 @@ import { toRomaji } from "../core/romaji.js";
 import { esc, shuffle } from "../core/util.js";
 import { bindSearch, searchBox } from "./ui.js";
 
-const TITLES = { vocab: "Vocabulaire", kanji: "Kanji" };
+const TITLES = { kanji: "Kanji" };
 const SIZES = [10, 20, 30, 50, 0];
 
 // Weakest and never-seen items first, with a bit of randomness so sessions don't repeat.
-function prioritize(items, store) {
+export function prioritize(items, store) {
   return shuffle(items)
     .map((it) => ({ it, weight: store.mastery(it.key) + Math.random() * 0.3 }))
     .sort((a, b) => a.weight - b.weight)
@@ -88,30 +88,6 @@ function bindSetup(module, { app, store, runQuiz }) {
   };
 }
 
-const listLabel = (module, id) => LISTS[module].find((l) => l.id === id)?.label ?? id;
-
-function vocabTable(ui) {
-  return `
-    <div class="card"><h2>Liste</h2>${searchBox()}
-      <div class="table-wrap"><table class="table">
-        <thead><tr><th>Japonais</th><th>Lecture</th><th>Français</th><th>Liste</th><th></th></tr></thead>
-        <tbody>${MODULES.vocab
-          .map(
-            (w) => `
-          <tr data-search="${esc(`${w.jp} ${w.kana} ${w.romaji} ${w.fr}`)}">
-            <td><span class="jp big-cell">${esc(w.jp)}</span>${ui.meanings(w.jp)}</td>
-            <td><span class="jp">${esc(w.kana)}</span><br><span class="muted small">${esc(w.romaji)}</span>${w.note ? `<br><span class="muted small">dico : ${esc(w.note)}</span>` : ""}</td>
-            <td>${esc(w.fr)}${ui.tip(w)}</td>
-            <td class="small muted">${esc(listLabel("vocab", w.list))}</td>
-            <td class="nowrap">${ui.level(w.key)} ${ui.speakButton(w.kana)}</td>
-          </tr>`
-          )
-          .join("")}
-        </tbody>
-      </table></div>
-    </div>`;
-}
-
 function kanjiGrid(ui) {
   const readings = (list) =>
     list
@@ -139,7 +115,7 @@ function kanjiGrid(ui) {
 
 export function renderStudy(module, ctx) {
   const { app, store, ui } = ctx;
-  app.innerHTML = `<h1 class="page-title">${TITLES[module]}</h1>${setupPanel(module, store, ui)}${module === "vocab" ? vocabTable(ui) : kanjiGrid(ui)}`;
+  app.innerHTML = `<h1 class="page-title">${TITLES[module]}</h1>${setupPanel(module, store, ui)}${kanjiGrid(ui)}`;
   bindSetup(module, ctx);
   bindSearch(app);
 }

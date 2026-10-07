@@ -6,6 +6,7 @@ import { createUi } from "./views/ui.js";
 import { renderHome, runDaily } from "./views/home.js";
 import { renderKana } from "./views/kana.js";
 import { renderStudy } from "./views/study.js";
+import { renderVocab } from "./views/vocab.js";
 import { renderTips } from "./views/tips.js";
 import { renderProgress } from "./views/progress.js";
 import { renderWelcome } from "./views/welcome.js";
@@ -23,16 +24,16 @@ function applyTheme() {
   const theme = store.profile?.settings.theme ?? "kanapro";
   document.body.classList.toggle("theme-kp", theme === "kanapro");
   const toggle = document.getElementById("theme-toggle");
-  toggle.textContent = theme === "kanapro" ? "Thème : Kana Pro" : "Thème : Moderne";
+  toggle.textContent = theme === "kanapro" ? "Thème : Classique" : "Thème : Moderne";
   toggle.hidden = !store.profile;
 }
 
-function runQuiz(entries, title, back) {
+function runQuiz(entries, title, back, extra = {}) {
   if (!entries.length) {
     alert("Aucune question : sélectionne au moins une liste.");
     return;
   }
-  startSession(app, entries, { store, ui, title, onExit: () => go(back) });
+  startSession(app, entries, { store, ui, title, onExit: () => go(back), ...extra });
 }
 
 const ctx = { app, store, ui, go, runQuiz, applyTheme };
@@ -41,7 +42,7 @@ const ROUTES = {
   "": () => renderHome(ctx),
   daily: () => runDaily(ctx),
   kana: () => renderKana(ctx),
-  vocab: () => renderStudy("vocab", ctx),
+  vocab: (path) => renderVocab(ctx, path),
   kanji: () => renderStudy("kanji", ctx),
   tips: () => renderTips(ctx),
   progress: () => renderProgress(ctx)
@@ -53,11 +54,11 @@ function render() {
     renderWelcome(ctx);
     return;
   }
-  const route = location.hash.replace(/^#\/?/, "").split("/")[0];
+  const [route, ...path] = location.hash.replace(/^#\/?/, "").split("/");
   document
     .querySelectorAll("nav a")
     .forEach((a) => a.classList.toggle("active", a.getAttribute("href") === `#/${route}`));
-  (ROUTES[route] ?? ROUTES[""])();
+  (ROUTES[route] ?? ROUTES[""])(path);
   window.scrollTo(0, 0);
 }
 
