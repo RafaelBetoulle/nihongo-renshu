@@ -33,3 +33,27 @@ export const KANA_ROWS = {
     ["pya", [["ぴゃ","ピャ","pya"],["ぴゅ","ピュ","pyu"],["ぴょ","ピョ","pyo"]]]
   ]
 };
+
+// Other spellings accepted when typing, keyed by hiragana (the katakana of the same cell shares them).
+export const KANA_ALT_ROMAJI = {
+  し: ["si"], ち: ["ti"], つ: ["tu"], ふ: ["hu"], を: ["o"],
+  じ: ["zi"], ず: ["du"], ぢ: ["di", "dzi"], づ: ["dzu"],
+  しゃ: ["sya"], しゅ: ["syu"], しょ: ["syo"],
+  ちゃ: ["cya", "tya"], ちゅ: ["cyu"], ちょ: ["cyo"],
+  じゃ: ["jya"], じゅ: ["jyu"], じょ: ["jyo"]
+};
+
+// Katakana that are easy to mix up, practised together.
+export const KATAKANA_LOOKALIKES = [
+  ["like1", ["シ", "ツ", "ソ", "ン", "ノ"]],
+  ["like2", ["ウ", "フ", "ワ", "ラ", "ス", "ヌ", "ヲ"]]
+];
+
+// Katakana-only combinations used for foreign sounds: [id, [[katakana, romaji], ...]]
+export const KATAKANA_EXTRA = [
+  ["fa", [["ファ","fa"],["フィ","fi"],["フェ","fe"],["フォ","fo"],["フュ","fyu"]]],
+  ["wi", [["ウィ","wi"],["ウェ","we"],["ウォ","wo"],["ヴァ","va"],["ヴィ","vi"],["ヴェ","ve"],["ヴォ","vo"]]],
+  ["tsa", [["ツァ","tsa"],["ツィ","tsi"],["ツェ","tse"],["ツォ","tso"]]],
+  ["che", [["チェ","che"],["シェ","she"],["ジェ","je"]]],
+  ["ti", [["ティ","ti"],["ディ","di"],["デュ","du"],["トゥ","tu"]]]
+];

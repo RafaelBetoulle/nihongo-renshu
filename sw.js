@@ -1,4 +1,4 @@
-const CACHE = "nihongo-renshu-v1";
+const CACHE = "nihongo-renshu-v2";
 
 const ASSETS = [
   "./",
@@ -21,6 +21,7 @@ const ASSETS = [
   "src/content/vocab.js",
   "src/quiz/catalog.js",
   "src/quiz/daily.js",
+  "src/quiz/kanapro.js",
   "src/quiz/session.js",
   "src/core/japanese.js",
   "src/core/romaji.js",

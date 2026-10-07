@@ -8,8 +8,9 @@ l'appareil.
 
 ## Fonctionnalités
 
-- **Kana façon [Kana Pro](https://kana.pro/legacy)** : choisis les lignes à réviser, un caractère s'affiche, tape le
-  rōmaji. C'est validé dès que c'est juste, et un caractère raté revient en fin de série.
+- **Kana façon [Kana Pro](https://kana.pro/legacy)** : choisis les groupes à réviser puis enchaîne les 4 étapes
+  (QCM, QCM inversé, saisie, trois caractères à la fois). Il faut 20 points par étape : +1 par bonne réponse, −1 par
+  erreur. Tu choisis les étapes à jouer : une seule ou plusieurs.
 - **Vocabulaire** : 10 listes thématiques (~150 mots), à réviser dans les deux sens, en QCM ou en tapant le rōmaji.
 - **Kanji N5** : environ 100 kanji avec leur sens, leurs lectures on/kun et des mots d'exemple.
 - **Daily** : chaque jour, une session en vrac qui mélange ce qui est à revoir (répétition espacée), tes points
